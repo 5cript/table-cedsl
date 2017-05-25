@@ -15,7 +15,7 @@ Meant to be used in combination with SOCI.
 // namespace ...
 DECLARE_TABLE_3
 (
-	// Table class "User" in namespace Carbonide::Server::Database::Tables
+    // Table class "User" in namespace Carbonide::Server::Database::Tables
     User, (Carbonide)(Server)(Database)(Tables),
     (int, UserID, NOT_NULL, PRIMARY_KEY, AUTO_INCREMENT)
     (std::string, Name, TYPE(VARCHAR), SIZE(255), NOT_NULL)
