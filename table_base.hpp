@@ -1,5 +1,4 @@
-#ifndef DATABASE_TABLES_TABLE_BASE_HPP_INCLUDED
-#define DATABASE_TABLES_TABLE_BASE_HPP_INCLUDED
+#pragma once
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/at.hpp>
@@ -16,7 +15,7 @@
 #include <type_traits>
 #include <tuple>
 
-namespace Carbonide { namespace Server { namespace Database { namespace Tables {
+namespace TableCesdl {
 
     template <std::size_t S>
     using SizeTypeWrapper = std::integral_constant<std::size_t, S>;
@@ -42,10 +41,7 @@ namespace Carbonide { namespace Server { namespace Database { namespace Tables {
         constexpr static const bool primaryKey = PrimaryKey;
     };
 
-} // namespace Tables
-} // namespace Database
-} // namespace Server
-} // namespace Carbonide
+} // namespace TableCesdl
 
 #include "preprocessor_includes.hpp"
 #include "field_types.hpp"
@@ -318,5 +314,3 @@ namespace Carbonide { namespace Server { namespace Database { namespace Tables {
                         nspace, \
                         table_attributes)
 //##########################################################################################################
-
-#endif // DATABASE_TABLES_TABLE_BASE_HPP_INCLUDED

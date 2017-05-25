@@ -1,5 +1,4 @@
-#ifndef DATABASE_TABLES_BASE_TABLE_CREATE_HPP_INCLUDED
-#define DATABASE_TABLES_BASE_TABLE_CREATE_HPP_INCLUDED
+#pragma once
 
 #include "table_base.hpp"
 
@@ -7,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-namespace Carbonide { namespace Server { namespace Database { namespace Tables {
+namespace TableCesdl
 
     template <typename TableT, typename StreamT>
     void createTableQuery(StreamT& stream, bool ignoreExisting = true)
@@ -63,9 +62,4 @@ namespace Carbonide { namespace Server { namespace Database { namespace Tables {
         return sstr.str();
     }
 
-} // namespace Tables
-} // namespace Database
-} // namespace Server
-} // namespace Carbonide
-
-#endif // DATABASE_TABLES_BASE_TABLE_CREATE_HPP_INCLUDED
+} // namespace TableCesdl

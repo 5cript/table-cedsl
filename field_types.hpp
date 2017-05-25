@@ -1,9 +1,8 @@
-#ifndef DATABASE_TABLES_BASE_FIELD_TYPES_HPP_INCLUDED
-#define DATABASE_TABLES_BASE_FIELD_TYPES_HPP_INCLUDED
+#pragma once
 
 #include <ctime>
 
-namespace Carbonide { namespace Server { namespace Database { namespace Tables {
+namespace TableCesdl {
 
 #   define DECLARE_TYPE(NAME) \
     struct NAME { \
@@ -55,9 +54,4 @@ namespace Carbonide { namespace Server { namespace Database { namespace Tables {
     #undef DECLARE_TYPE
     #undef TRANSLATE_TYPE
 
-} // namespace Tables
-} // namespace Database
-} // namespace Server
-} // namespace Carbonide
-
-#endif // DATABASE_TABLES_BASE_FIELD_TYPES_HPP_INCLUDED
+} // namespace  TableCesdl
