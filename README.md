@@ -4,7 +4,7 @@ Meant to be used in combination with SOCI.
 
 ## How it looks
 
-´´´C++
+```C++
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -35,4 +35,4 @@ int main()
 	std::cout << query.str() << "\n";
 	return 0;
 }
-´´´
+```
