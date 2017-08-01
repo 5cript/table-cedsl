@@ -7,9 +7,9 @@
 #include <sstream>
 
 namespace TableCesdl
-
+{
     template <typename TableT, typename StreamT>
-    void createTableQuery(StreamT& stream, bool ignoreExisting = true)
+    void createTableQuery(StreamT& stream, bool ignoreExisting = true, bool ignoreTableAttributes = false)
     {
         using range = boost::mpl::range_c <int, 0, boost::fusion::result_of::size <TableT>::type::value>;
 
@@ -47,18 +47,18 @@ namespace TableCesdl
 
         stream << ")";
 
-        if (TableT::tableAttributes::charsetSpecified)
+        if (TableT::tableAttributes::charsetSpecified && !ignoreTableAttributes)
             stream << " CHARACTER SET " << TableT::tableAttributes::charset;
 
-        if (TableT::tableAttributes::collateSpecified)
+        if (TableT::tableAttributes::collateSpecified && !ignoreTableAttributes)
             stream << " COLLATE " << TableT::tableAttributes::collate;
     }
 
     template <typename T>
-    std::string createTableQuery(bool ignoreExisting = true)
+    std::string createTableQuery(bool ignoreExisting = true, bool ignoreTableAttributes = false)
     {
         std::stringstream sstr;
-        createTableQuery <T>(sstr, ignoreExisting);
+        createTableQuery <T>(sstr, ignoreExisting, ignoreTableAttributes);
         return sstr.str();
     }
 

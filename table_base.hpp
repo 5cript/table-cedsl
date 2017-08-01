@@ -135,7 +135,7 @@ namespace TableCesdl {
 
 //##########################################################################################################
 
-#define UNSPECIFIED_TYPE(tuple) DetermineFieldType <BOOST_PP_SEQ_HEAD(BOOST_PP_TUPLE_TO_SEQ(tuple))>::type
+#define UNSPECIFIED_TYPE(tuple) TableCesdl::DetermineFieldType <BOOST_PP_SEQ_HEAD(BOOST_PP_TUPLE_TO_SEQ(tuple))>::type
 
 #define EXTRACT_TYPE_PRED(s, data, elem) \
     BOOST_PP_EQUAL(BOOST_PP_SEQ_HEAD(TYPE_ID), BOOST_PP_SEQ_HEAD(elem))
@@ -153,7 +153,7 @@ namespace TableCesdl {
 
 //##########################################################################################################
 
-#define UNSPECIFIED_SIZE(...) SizeTypeWrapper <0>
+#define UNSPECIFIED_SIZE(...) TableCesdl::SizeTypeWrapper <0>
 
 #define EXTRACT_TYPE_SIZE_PRED(s, data, elem) \
     BOOST_PP_EQUAL(BOOST_PP_SEQ_HEAD(SIZE_ID), BOOST_PP_SEQ_HEAD(elem))
@@ -232,7 +232,7 @@ namespace TableCesdl {
     BOOST_PP_IF(IS_IN_FIELD_TUPLE(field_tuple, attr), true, false)
 
 #define TABLE_ATTRIBUTES(r, data, i, field_tuple) \
-    BOOST_PP_COMMA_IF(i) FieldAttributes <\
+    BOOST_PP_COMMA_IF(i) TableCesdl::FieldAttributes <\
         BOOST_PP_TUPLE_ELEM(MAX_ARGUMENTS, 0, SET_TUPLE_SIZE(field_tuple, MAX_ARGUMENTS)), \
         EXTRACT_TYPE(field_tuple), \
         EXTRACT_TYPE_SIZE(field_tuple)::value, \
