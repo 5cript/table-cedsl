@@ -8,6 +8,25 @@
 
 namespace TableCesdl
 {
+    template <typename StreamT, typename ForeignKeyDesc>
+    struct foreignKeyEx
+    {
+        static bool op(StreamT& stream, std::string const& name)
+        {
+            stream << "FOREIGN KEY(" << name << ") REFERENCES " << ForeignKeyDesc::table::c_str << "(" << ForeignKeyDesc::key::c_str << ")";
+            return true;
+        }
+    };
+
+    template <typename StreamT>
+    struct foreignKeyEx <StreamT, TableCesdl::NotForeignKey>
+    {
+        static bool op(StreamT& stream, ...)
+        {
+            return false;
+        }
+    };
+
     template <typename TableT, typename StreamT>
     void createTableQuery(StreamT& stream, bool ignoreExisting = true, bool ignoreTableAttributes = false)
     {
@@ -38,6 +57,8 @@ namespace TableCesdl
 
             if (attribute::primaryKey)
                 stream << " PRIMARY KEY";
+
+            foreignKeyEx <StreamT, typename attribute::references>::op(stream, name);
 
             if (decltype(index)::value < boost::fusion::result_of::size <TableT>::type::value - 1)
                 stream << ",";

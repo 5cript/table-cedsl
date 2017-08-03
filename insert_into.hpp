@@ -12,7 +12,7 @@ namespace TableCesdl
 
         stream << "INSERT INTO " << TableT::__name << "(";
         boost::mpl::for_each <range> ([&](auto index) {
-            using attribute = typename std::tuple_element <decltype(index)::value, typename TableT::attributes>::type;
+            //using attribute = typename std::tuple_element <decltype(index)::value, typename TableT::attributes>::type;
             std::string name = boost::fusion::extension::struct_member_name<TableT, decltype(index)::value>::call();
 
             stream << name;

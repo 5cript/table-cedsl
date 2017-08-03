@@ -1,11 +1,14 @@
 #pragma once
 
+#include "cexpr_string.hpp"
+
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
+#include <boost/hana/string.hpp>
 
 #include <boost/optional.hpp>
 
@@ -20,16 +23,27 @@ namespace TableCesdl {
     template <std::size_t S>
     using SizeTypeWrapper = std::integral_constant<std::size_t, S>;
 
+    template <typename Table, typename Key>
+    struct ForeignKey
+    {
+        using table = Table;
+        using key = Key;
+    };
+
+    struct NotForeignKey {};
+
     template <typename T,
               typename SpecialType,
               std::size_t Size,
               bool NotNull,
               bool AutoIncrement,
-              bool PrimaryKey>
+              bool PrimaryKey,
+              typename ForeignKey = NotForeignKey>
     struct FieldAttributes
     {
         using ctype = T;
         using type = SpecialType;
+        using references = ForeignKey;
 
         // constexpr static produces linker error
         enum : std::size_t {
@@ -56,9 +70,11 @@ namespace TableCesdl {
 #define SIZE_ID (3)
 #define TYPE_ID (4)
 #define PRIMARY_KEY (5)
+#define REFERENCES_ID (6)
 
 #define SIZE(X) SIZE_ID(SizeTypeWrapper <X>)
 #define TYPE(X) TYPE_ID(X)
+#define REFERENCES(X, Y) REFERENCES_ID(X)(Y)
 /////////////////////////////////////////////////////////////////////////
 
 ////////////////////////// TABLE ATTRIBUTES /////////////////////////////
@@ -171,6 +187,31 @@ namespace TableCesdl {
 
 //##########################################################################################################
 
+
+#define UNSPECIFIED_FOREIGN_KEY(...) TableCesdl::NotForeignKey
+
+#define EXTRACT_REFERENCES_ATTRIBUTE_PRED(s, data, elem) \
+    BOOST_PP_EQUAL(BOOST_PP_SEQ_HEAD(REFERENCES_ID), BOOST_PP_SEQ_HEAD(elem))
+
+#define EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple) \
+    BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_FILTER(EXTRACT_REFERENCES_ATTRIBUTE_PRED, ~, BOOST_PP_TUPLE_TO_SEQ( \
+        BOOST_PP_TUPLE_POP_FRONT(BOOST_PP_TUPLE_POP_FRONT(tuple)) \
+    )))
+
+#define EXTRACT_REFERENCES_ATTRIBUTE_IMPL(tuple) \
+    TableCesdl::ForeignKey < \
+        TCEDSL_LONG_STRING(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(1, EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple)))), \
+        TCEDSL_LONG_STRING(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(2, EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple)))) \
+    >
+
+#define EXTRACT_REFERENCES_ATTRIBUTE(tuple) \
+    BOOST_PP_IF(BOOST_PP_AND( \
+        IS_IN_FIELD_TUPLE(tuple, REFERENCES_ID), \
+        BOOST_PP_GREATER(BOOST_PP_TUPLE_SIZE(tuple), 2) \
+    ), EXTRACT_REFERENCES_ATTRIBUTE_IMPL, UNSPECIFIED_FOREIGN_KEY)(tuple)
+
+//##########################################################################################################
+
 #define TUPLE_NOT_EMPTY(tuple) \
     BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(EPS_ATTRIBUTE BOOST_PP_TUPLE_ELEM(1, 0, tuple)))
 
@@ -238,7 +279,8 @@ namespace TableCesdl {
         EXTRACT_TYPE_SIZE(field_tuple)::value, \
         BOOLEAN_ATTRIBUTE(field_tuple, NOT_NULL), \
         BOOLEAN_ATTRIBUTE(field_tuple, AUTO_INCREMENT), \
-        BOOLEAN_ATTRIBUTE(field_tuple, PRIMARY_KEY) \
+        BOOLEAN_ATTRIBUTE(field_tuple, PRIMARY_KEY), \
+        EXTRACT_REFERENCES_ATTRIBUTE(field_tuple) \
     >
 
 #define TABLE_ADAPT_ENTRY(r, data, field_tuple) \
