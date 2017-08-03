@@ -8,7 +8,6 @@
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
-#include <boost/hana/string.hpp>
 
 #include <boost/optional.hpp>
 
@@ -74,7 +73,8 @@ namespace TableCesdl {
 
 #define SIZE(X) SIZE_ID(SizeTypeWrapper <X>)
 #define TYPE(X) TYPE_ID(X)
-#define REFERENCES(X, Y) REFERENCES_ID(X)(Y)
+#define REFERENCES(X) REFERENCES_ID(X)
+#define FOREIGN_KEY(X) REFERENCES_ID(X)
 /////////////////////////////////////////////////////////////////////////
 
 ////////////////////////// TABLE ATTRIBUTES /////////////////////////////
@@ -198,11 +198,14 @@ namespace TableCesdl {
         BOOST_PP_TUPLE_POP_FRONT(BOOST_PP_TUPLE_POP_FRONT(tuple)) \
     )))
 
-#define EXTRACT_REFERENCES_ATTRIBUTE_IMPL(tuple) \
+#define EXTRACT_REFERENCES_ATTRIBUTE_IMPL_2(seq) \
     TableCesdl::ForeignKey < \
-        TCEDSL_LONG_STRING(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(1, EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple)))), \
-        TCEDSL_LONG_STRING(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(2, EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple)))) \
+        TCEDSL_STRING_CONFIGURED(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_HEAD(seq))), \
+        TCEDSL_STRING_CONFIGURED(BOOST_PP_STRINGIZE(BOOST_PP_SEQ_TAIL(seq))) \
     >
+
+#define EXTRACT_REFERENCES_ATTRIBUTE_IMPL(tuple) \
+    EXTRACT_REFERENCES_ATTRIBUTE_IMPL_2(BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_TAIL(EXTRACT_REFERENCES_ATTRIBUTE_PRED_BASE(tuple))))
 
 #define EXTRACT_REFERENCES_ATTRIBUTE(tuple) \
     BOOST_PP_IF(BOOST_PP_AND( \
@@ -295,6 +298,10 @@ namespace TableCesdl {
 #define NAMESPACE_SEQ(nspace) \
     BOOST_PP_SEQ_FOR_EACH(NAMESPACE_SEQ_EACH, ~, nspace)
 
+/**
+ *  Input: (A)(B)(C)
+ *  Output: A::B::C
+ */
 #define NAMESPACE_COLON_SEQ(nspace) \
     BOOST_PP_SEQ_FOR_EACH_I(NAMESPACE_COLON_SEQ_EACH, ::, nspace)
 

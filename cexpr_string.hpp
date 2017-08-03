@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/preprocessor/cat.hpp>
+
 namespace TableCesdl
 {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,15 +147,26 @@ namespace TableCesdl
     #define TCEDSL_SPLIT_1(s, x)    TableCesdl::char_<( x < sizeof(s) ? s[x] : '\0' )>
     #define TCEDSL_SPLIT_4(s, x)    TCEDSL_SPLIT_1  (s, x), TCEDSL_SPLIT_1  (s, x+1)  , TCEDSL_SPLIT_1  (s, x+2)  , TCEDSL_SPLIT_1  (s, x+3)
     #define TCEDSL_SPLIT_16(s, x)   TCEDSL_SPLIT_4  (s, x), TCEDSL_SPLIT_4  (s, x+4)  , TCEDSL_SPLIT_4  (s, x+8)  , TCEDSL_SPLIT_4  (s, x+12)
+    #define TCEDSL_SPLIT_32(s, x)   TCEDSL_SPLIT_16 (s, x), TCEDSL_SPLIT_16 (s, x+16)
     #define TCEDSL_SPLIT_64(s, x)   TCEDSL_SPLIT_16 (s, x), TCEDSL_SPLIT_16 (s, x+16) , TCEDSL_SPLIT_16 (s, x+32) , TCEDSL_SPLIT_16 (s, x+48)
     #define TCEDSL_SPLIT_256(s, x)  TCEDSL_SPLIT_64 (s, x), TCEDSL_SPLIT_64 (s, x+64) , TCEDSL_SPLIT_64 (s, x+128) , TCEDSL_SPLIT_64 (s, x+194)
     #define TCEDSL_SPLIT_1024(s, x) TCEDSL_SPLIT_256(s, x), TCEDSL_SPLIT_256(s, x+256), TCEDSL_SPLIT_256(s, x+512), TCEDSL_SPLIT_256(s, x+768)
 
-    #define TCEDSL_STRING_IMPL(str, n) TableCesdl::apply_t <TableCesdl::trim_right_t <TableCesdl::pack <TCEDSL_SPLIT_##n(str, 0)>, TableCesdl::is_zero>, TableCesdl::cexpr_string>
+    #define TCEDSL_STRING_IMPL(str, n) TableCesdl::apply_t < \
+        TableCesdl::trim_right_t < \
+            TableCesdl::pack <BOOST_PP_CAT(TCEDSL_SPLIT_,n)(str, 0)>, TableCesdl::is_zero \
+        >, TableCesdl::cexpr_string \
+    >
 
     #define TCEDSL_SHORT_STRING(str) TCEDSL_STRING_IMPL(str, 16)
+    #define TCEDSL_MEDIUM_STRING(str) TCEDSL_STRING_IMPL(str, 32)
     #define TCEDSL_STRING(str) TCEDSL_STRING_IMPL(str, 64)
     #define TCEDSL_LONG_STRING(str) TCEDSL_STRING_IMPL(str, 256) // HEAVY
     #define TCEDSL_LONG_LONG_STRING(str) TCEDSL_STRING_IMPL(str, 1024) // ULTRA HEAVY
+
+    #ifndef TCEDSL_STRING_SIZE
+    #   define TCEDSL_STRING_SIZE 32
+    #endif
+    #define TCEDSL_STRING_CONFIGURED(str) TCEDSL_STRING_IMPL(str, TCEDSL_STRING_SIZE)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
