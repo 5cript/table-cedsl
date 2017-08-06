@@ -13,7 +13,7 @@ namespace TableCesdl
     {
         static bool op(StreamT& stream, std::string const& name)
         {
-            stream << "FOREIGN KEY(" << name << ") REFERENCES " << ForeignKeyDesc::table::c_str << "(" << ForeignKeyDesc::key::c_str << ")";
+            stream << ",\n\tFOREIGN KEY(" << name << ") REFERENCES " << ForeignKeyDesc::table::c_str << ForeignKeyDesc::key::c_str;
             return true;
         }
     };
@@ -58,12 +58,21 @@ namespace TableCesdl
             if (attribute::primaryKey)
                 stream << " PRIMARY KEY";
 
-            foreignKeyEx <StreamT, typename attribute::references>::op(stream, name);
+
 
             if (decltype(index)::value < boost::fusion::result_of::size <TableT>::type::value - 1)
+            {
                 stream << ",";
+                stream << "\n";
+            }
+        });
 
-            stream << "\n";
+        boost::mpl::for_each <range> ([&](auto index) {
+            using attribute = typename std::tuple_element <decltype(index)::value, typename TableT::attributes>::type;
+            std::string name = boost::fusion::extension::struct_member_name<TableT, decltype(index)::value>::call();
+
+            if (foreignKeyEx <StreamT, typename attribute::references>::op(stream, name))
+                stream << "\n";
         });
 
         stream << ")";
